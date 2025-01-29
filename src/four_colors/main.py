@@ -1,8 +1,8 @@
 from .view.ui_compiled.main import Ui_MainWindow
+from collections import defaultdict
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QGraphicsPixmapItem, QGraphicsScene
-from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap, QImage, QColor
 
 
 
@@ -46,6 +46,7 @@ class App:
         pixmap_item = QGraphicsPixmapItem(pixmap)
         self.graphic_scene.addItem(pixmap_item)
         self.fit_image_to_view(pixmap_item)
+        self.extract_prominent_colors(file_path)
 
     def fit_image_to_view(self, pixmap_item):
         # Get the image size and the view size
@@ -58,3 +59,24 @@ class App:
 
         # Center the image in the view
         self.window.graphicsView.centerOn(pixmap_item)
+
+
+    def extract_prominent_colors(self, file_path):
+        le_colors = defaultdict(int)
+        image = QImage(file_path)
+        if image.format() != QImage.Format.Format_RGB888:
+            image = image.convertToFormat(QImage.Format.Format_RGB888)
+
+        for y in range(image.height()):
+            for x in range(image.width()):
+                color = QColor(image.pixel(x, y))
+                color_tuple = color.getRgb()[:3]
+                le_colors[color_tuple] += 1
+        
+
+        i = 0
+        for w in sorted(le_colors.items(), key=lambda x: x[1], reverse=True):
+            i += 1
+            print(w)
+            if i == 4:
+                break
