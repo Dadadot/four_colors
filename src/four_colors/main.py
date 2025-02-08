@@ -1,9 +1,17 @@
-from .view.ui_compiled.main import Ui_MainWindow
 from collections import defaultdict
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QGraphicsPixmapItem, QGraphicsScene, QPushButton
-from PySide6.QtGui import QPixmap, QImage, QColor
 
+from PySide6.QtGui import QColor, QImage, QPixmap
+from PySide6.QtWidgets import (
+    QApplication,
+    QGraphicsPixmapItem,
+    QGraphicsScene,
+    QMainWindow,
+    QPushButton,
+)
+
+from .view.ui_compiled.main import Ui_MainWindow
+from .model import ImageLoader
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -11,21 +19,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
 
-class FileBrowser:
-    @staticmethod
-    def load_image(parent) -> str:
-        file_name, _ = QFileDialog.getOpenFileName(
-        parent, 
-        'Open Image File', 
-        '', 
-        'Images (*.png *.xpm *.jpg *.jpeg *.bmp *.gif *.webp)'  # Add more image formats if needed
-        )
-        return file_name
 
 class App:
     def __init__(self) -> None:
         self.app = QApplication(sys.argv)
         self.window = MainWindow()
+        self.image_loader = ImageLoader()
         self.graphic_scene = QGraphicsScene()
         self.window.graphicsView.setScene(self.graphic_scene)
         self.window.pushButton.clicked.connect(lambda: self.load_image())
@@ -33,36 +32,19 @@ class App:
     def run(self) -> QApplication:
         self.window.show()
         sys.exit(self.app.exec())
-    
+
     def quit(self):
         self.app.quit()
 
     def load_image(self):
-        file_browser = FileBrowser
-        file_path = file_browser.load_image(self.window)
-        if not file_path:
-            return
-        pixmap = QPixmap(file_path)
-        pixmap_item = QGraphicsPixmapItem(pixmap)
+        file_path = self.image_loader.get_image_path()
+        pixmap_item = self.image_loader.get_pixmap_item(file_path)
         self.graphic_scene.addItem(pixmap_item)
-        self.fit_image_to_view(pixmap_item)
         colors = self.extract_prominent_colors(file_path)
         for c in colors:
             b = QPushButton()
             b.setStyleSheet(f"background-color: rgb({c[0]}, {c[1]}, {c[2]});")
             self.window.c_colors.addWidget(b)
-
-    def fit_image_to_view(self, pixmap_item):
-        # Get the image size and the view size
-        pixmap = pixmap_item.pixmap()
-        view_rect = self.window.graphicsView.viewport().rect()
-        pixmap_size = pixmap.size()
-
-        # Scale the pixmap to fit the view while maintaining the aspect ratio
-        pixmap_item.setScale(min(view_rect.width() / pixmap_size.width(), view_rect.height() / pixmap_size.height()))
-
-        # Center the image in the view
-        self.window.graphicsView.centerOn(pixmap_item)
 
 
     def extract_prominent_colors(self, file_path):
@@ -79,7 +61,7 @@ class App:
 
         i = 0
         colors_return = []
-        for t, count in sorted(le_colors.items(), key=lambda x: x[1], reverse=True):
+        for t, _ in sorted(le_colors.items(), key=lambda x: x[1], reverse=True):
             i += 1
             colors_return.append(t)
             if i == 4:
