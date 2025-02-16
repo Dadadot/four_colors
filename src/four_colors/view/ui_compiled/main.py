@@ -11,41 +11,78 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QGraphicsView, QHBoxLayout, QMainWindow,
-    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QMainWindow, QMenu,
+    QMenuBar, QSizePolicy, QStatusBar, QVBoxLayout,
     QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(800, 601)
+        self.actionLoad = QAction(MainWindow)
+        self.actionLoad.setObjectName(u"actionLoad")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.pushButton = QPushButton(self.centralwidget)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setGeometry(QRect(170, 80, 87, 26))
-        self.graphicsView = QGraphicsView(self.centralwidget)
-        self.graphicsView.setObjectName(u"graphicsView")
-        self.graphicsView.setGeometry(QRect(360, 10, 341, 301))
-        self.horizontalLayoutWidget = QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
-        self.horizontalLayoutWidget.setGeometry(QRect(190, 360, 501, 80))
-        self.c_colors = QHBoxLayout(self.horizontalLayoutWidget)
+        self.verticalLayout_3 = QVBoxLayout(self.centralwidget)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.horizontalWidget_2 = QWidget(self.centralwidget)
+        self.horizontalWidget_2.setObjectName(u"horizontalWidget_2")
+        self.horizontalLayout = QHBoxLayout(self.horizontalWidget_2)
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.c_image_main = QWidget(self.horizontalWidget_2)
+        self.c_image_main.setObjectName(u"c_image_main")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.c_image_main.sizePolicy().hasHeightForWidth())
+        self.c_image_main.setSizePolicy(sizePolicy)
+        self.verticalLayout = QVBoxLayout(self.c_image_main)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+
+        self.horizontalLayout.addWidget(self.c_image_main)
+
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.c_image_selection = QVBoxLayout()
+        self.c_image_selection.setObjectName(u"c_image_selection")
+
+        self.verticalLayout_2.addLayout(self.c_image_selection)
+
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.c_colors = QHBoxLayout()
         self.c_colors.setObjectName(u"c_colors")
-        self.c_colors.setContentsMargins(0, 0, 0, 0)
+
+        self.horizontalLayout_2.addLayout(self.c_colors)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+
+
+        self.horizontalLayout.addLayout(self.verticalLayout_2)
+
+
+        self.verticalLayout_3.addWidget(self.horizontalWidget_2)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 800, 23))
+        self.menuLoad_Image = QMenu(self.menubar)
+        self.menuLoad_Image.setObjectName(u"menuLoad_Image")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.menubar.addAction(self.menuLoad_Image.menuAction())
+        self.menuLoad_Image.addAction(self.actionLoad)
 
         self.retranslateUi(MainWindow)
 
@@ -54,6 +91,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.actionLoad.setText(QCoreApplication.translate("MainWindow", u"Load", None))
+        self.menuLoad_Image.setTitle(QCoreApplication.translate("MainWindow", u"Image", None))
     # retranslateUi
 

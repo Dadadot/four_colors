@@ -59,12 +59,18 @@
    </property>
    <widget class="QMenu" name="menuLoad_Image">
     <property name="title">
-     <string>Load Image</string>
+     <string>Image</string>
     </property>
+    <addaction name="actionLoad"/>
    </widget>
    <addaction name="menuLoad_Image"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLoad">
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
