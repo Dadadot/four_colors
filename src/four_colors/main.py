@@ -111,8 +111,7 @@ class App:
             color_distance_zip.sort(key=lambda x: x[1])
             tmp_color = color_distance_zip[0][0]
             distance = color_distance_zip[0][1]
-            if distance < 25:
-                named_color_count[tmp_color] += 1
+            named_color_count[tmp_color] += 1
         named_colors = sorted(
             named_color_count.items(), key=lambda x: x[1], reverse=True
         )
