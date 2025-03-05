@@ -1,9 +1,9 @@
 from typing import List, Optional
+from four_colors import Signals
 
 from PySide6.QtCore import QPointF, Qt, QSize, QRectF
 from PySide6.QtGui import QBrush, QPen, QMouseEvent, QColor, QPixmap, QImage
 from PySide6.QtWidgets import (
-    QGraphicsEllipseItem,
     QGraphicsScene,
     QGraphicsView,
     QGraphicsRectItem,
@@ -38,20 +38,30 @@ class CostumGraphicsView(QGraphicsView):
         super().__init__(parent)
         self.setScene(QGraphicsScene(self))
         self.image_graphics_pixmap: QGraphicsPixmapItem
-        # self.scene().setSceneRect(0, 0, 500, 500)
-        self.selection_point_start: QPointF
-        self.selection_point_end: QPointF
-        self.selection_rect: Optional[QGraphicsRectItem]
-        self._state = GVStates.SELECT
-        self.setFixedSize(QSize(500, 500))
-        # Disable scrollbars
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         # Set transformations to be disabled (no scaling or panning)
         self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorViewCenter)
         self.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorViewCenter)
-        self.image_graphics_pixmap.
+        # self.image_graphics_pixmap.
+
+
+    def display_image(self, image: QImage):
+        image_pixmap = QPixmap(image)
+        self.scene().clear()
+        self.image_graphics_pixmap = self.scene().addPixmap(image_pixmap)
+        self.scene().setSceneRect(0, 0, image_pixmap.width(), image_pixmap.height())
+        self.fitInView(self.image_graphics_pixmap, Qt.AspectRatioMode.KeepAspectRatio)
+
+
+class SelectionGraphicsView(CostumGraphicsView):
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
+        self.selection_point_start: QPointF
+        self.selection_point_end: QPointF
+        self.selection_rect: Optional[QGraphicsRectItem] = None
+        self._state = GVStates.SELECT
 
     @property
     def state(self):
@@ -75,11 +85,8 @@ class CostumGraphicsView(QGraphicsView):
         if event.button() == Qt.MouseButton.LeftButton:
             self.end_point = self.mapToScene(event.position().toPoint())
             self.dragging = False
-            self._clear_selection_rect()  # Remove the temporary rectangle
-
-    def display_image(self, image: QImage):
-        image_pixmap = QPixmap(image)
-        self.image_graphics_pixmap = self.scene().addPixmap(image_pixmap)
+            Signals.RectangleSelected.emit(self.selection_rect.rect())
+            self._clear_selection_rect()
 
     def _clear_selection_rect(self):
         """Removes the temporary rectangle from the scene."""
@@ -98,19 +105,3 @@ class CostumGraphicsView(QGraphicsView):
             self.selection_rect = self.scene().addRect(rect, pen, brush)
         else:
             self.selection_rect.setRect(rect)
-
-    def _fit_image_to_view(self, pixmap_item):
-        # Get the image size and the view size
-        pixmap = pixmap_item.pixmap()
-        view_rect = self.viewport().rect()
-        pixmap_size = pixmap.size()
-        scale = min(
-            view_rect.width() / pixmap_size.width(),
-            view_rect.height() / pixmap_size.height(),
-        )
-
-        # Scale the pixmap to fit the view while maintaining the aspect ratio
-        pixmap_item.setScale(scale)
-
-        # Center the image in the view
-        self.centerOn(pixmap_item)
